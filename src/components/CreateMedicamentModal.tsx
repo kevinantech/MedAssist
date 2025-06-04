@@ -22,7 +22,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { AppContext } from '../contexts/AppContext';
 import {
   MedicationBody,
-  MedicationBodySchema,
+  MedicationBodyBusinessRulesSchema,
   MedicationStatus,
 } from '../interfaces/medicament.interface';
 import { timePipe } from '../utils/timePipe';
@@ -31,8 +31,11 @@ const useMedicamentModal = (onClose: () => void) => {
   const { medicationsHook } = useContext(AppContext);
   const { control, handleSubmit, getValues, watch, reset } =
     useForm<MedicationBody>({
-      resolver: zodResolver(MedicationBodySchema),
-      defaultValues: { status: MedicationStatus.ACTIVE },
+      resolver: zodResolver(MedicationBodyBusinessRulesSchema),
+      defaultValues: {
+        customTimes: [],
+        status: MedicationStatus.ACTIVE,
+      },
     });
 
   const customTimes = useFieldArray({ control, name: 'customTimes' });

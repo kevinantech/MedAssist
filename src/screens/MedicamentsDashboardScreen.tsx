@@ -20,7 +20,6 @@ const useMedicamentsDashboard = () => {
 
 export default function MedicamentsDashboardScreen() {
   const { medications } = useMedicamentsDashboard();
-  console.log('🚀 ~ MedicamentsDashboardScreen ~ medications:', medications);
 
   const [createMedicamentModalIsOpen, setCreateMedicamentModalOpen] =
     useState(false);
