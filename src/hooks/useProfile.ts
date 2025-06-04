@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {PorfileSchema, Profile} from '../interfaces/profile.interface';
+import { useEffect, useState } from 'react';
+import { PorfileSchema, Profile } from '../interfaces/profile.interface';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const PROFILE_KEY = '@MedAssit:Profile';
 
@@ -10,7 +10,7 @@ const recoverProfile = async (): Promise<Profile | void> => {
     const profileString = await AsyncStorage.getItem(PROFILE_KEY);
     if (!profileString) return;
     const profile = JSON.parse(profileString);
-    const {data} = PorfileSchema.safeParse(profile);
+    const { data } = PorfileSchema.safeParse(profile);
     return data;
   } catch (error) {
     console.log('🚀 ~ recoverProfile ~ error:', error);
@@ -40,7 +40,7 @@ export const useProfile = () => {
   const handleUpdateProfile = async (payload: Partial<Profile>) => {
     if (!profile) return;
 
-    const updatedProfile = {...profile, ...payload};
+    const updatedProfile = { ...profile, ...payload };
     try {
       const stringify = JSON.stringify(updatedProfile);
       await AsyncStorage.setItem(PROFILE_KEY, stringify);
