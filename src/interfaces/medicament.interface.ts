@@ -7,9 +7,9 @@ export enum MedicationStatus {
   PENDING = 'pending',
 }
 
-export type MedicationSchedule = z.infer<typeof MedicationScheduleSchema>;
+export type MedicationBody = z.infer<typeof MedicationBodySchema>;
 
-export const MedicationScheduleSchema = z
+export const MedicationBodySchema = z
   .object({
     medicamentName: z.string(),
     doseNumberPerDay: z.number().min(1),

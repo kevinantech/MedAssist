@@ -2,14 +2,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import {
-  MedicationSchedule,
-  MedicationScheduleSchema,
+  MedicationBody,
+  MedicationBodySchema,
 } from '../interfaces/medicament.interface';
 const MEDICAMENTS_KEY = '@MedAssist:Medicaments';
 
 export type UseMedicationsHook = ReturnType<typeof useMedications>;
 
-const getMedicationsFromStorage = async (): Promise<MedicationSchedule[]> => {
+const getMedicationsFromStorage = async (): Promise<MedicationBody[]> => {
   try {
     const storedMedicaments = await AsyncStorage.getItem(MEDICAMENTS_KEY);
     const storedMedicamentsParsed = storedMedicaments
@@ -17,7 +17,7 @@ const getMedicationsFromStorage = async (): Promise<MedicationSchedule[]> => {
       : [];
 
     const { success } = z
-      .array(MedicationScheduleSchema)
+      .array(MedicationBodySchema)
       .safeParse(storedMedicamentsParsed);
     return success ? storedMedicamentsParsed : [];
   } catch (error) {
@@ -26,7 +26,7 @@ const getMedicationsFromStorage = async (): Promise<MedicationSchedule[]> => {
 };
 
 export const useMedications = () => {
-  const [medications, setMedications] = useState<MedicationSchedule[]>([]);
+  const [medications, setMedications] = useState<MedicationBody[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -35,7 +35,7 @@ export const useMedications = () => {
     })();
   }, []);
 
-  const handleNewMedication = async (input: MedicationSchedule) => {
+  const handleNewMedication = async (input: MedicationBody) => {
     const _medicaments = [...medications, { ...input }];
     setMedications(_medicaments);
     try {

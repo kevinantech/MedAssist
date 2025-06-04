@@ -21,8 +21,8 @@ import {
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { AppContext } from '../contexts/AppContext';
 import {
-  MedicationSchedule,
-  MedicationScheduleSchema,
+  MedicationBody,
+  MedicationBodySchema,
   MedicationStatus,
 } from '../interfaces/medicament.interface';
 import { timePipe } from '../utils/timePipe';
@@ -30,9 +30,9 @@ import { timePipe } from '../utils/timePipe';
 const useMedicamentModal = (onClose: () => void) => {
   const { medicationsHook } = useContext(AppContext);
   const { control, handleSubmit, getValues, watch, reset } =
-    useForm<MedicationSchedule>({
-      resolver: zodResolver(MedicationScheduleSchema),
-      defaultValues: { status: MedicationStatus.PENDING },
+    useForm<MedicationBody>({
+      resolver: zodResolver(MedicationBodySchema),
+      defaultValues: { status: MedicationStatus.ACTIVE },
     });
 
   const customTimes = useFieldArray({ control, name: 'customTimes' });
@@ -75,7 +75,7 @@ const useMedicamentModal = (onClose: () => void) => {
 
   const handleRemoveCustomTime = (index: number) => customTimes.remove(index);
 
-  const handleSubmitError = (error: FieldErrors<MedicationSchedule>) => {
+  const handleSubmitError = (error: FieldErrors<MedicationBody>) => {
     Alert.alert(
       'Datos incompletos o inválidos',
       error.customTimes
@@ -89,8 +89,11 @@ const useMedicamentModal = (onClose: () => void) => {
     );
   };
 
-  const handleNewMedication = async (data: MedicationSchedule) => {
-    await medicationsHook.handleNewMedication(data);
+  const handleNewMedication = async (data: MedicationBody) => {
+    await medicationsHook.handleNewMedication({
+      ...data,
+      startDate: new Date().toString(),
+    });
     reset();
     onClose();
   };

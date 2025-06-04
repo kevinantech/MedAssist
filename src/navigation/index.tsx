@@ -4,7 +4,7 @@ import HomeIcon from '../components/ui/HomeIcon';
 import { AppContext } from '../contexts/AppContext';
 import { useProfile } from '../hooks/useProfile';
 import CreateProfileScreen from '../screens/CreateProfileScreen';
-import HomeScreen from '../screens/HomeScreen';
+import HomeScreen from '../screens/HomeScreen/HomeScreen';
 import PillIcon from '../components/ui/PillIcon';
 import MedicamentsDashboardScreen from '../screens/MedicamentsDashboardScreen';
 import { useMedications } from '../hooks/useMedications';

@@ -1,12 +1,20 @@
-import { StatusBar, StyleSheet, Text } from 'react-native';
+import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useReminders } from '../../hooks/useReminders';
 
 export default function HomeScreen() {
+  const { remindersForToday } = useReminders();
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="white" />
       <Text style={styles.title}>MedAssist</Text>
       <Text style={styles.subtitle}>Recordatorios</Text>
+      {remindersForToday.map(reminder => (
+        <View key={reminder.time.getTime()}>
+          <Text>{reminder.medicationName}</Text>
+        </View>
+      ))}
       <Text style={styles.subtitle}>Seguimientos</Text>
     </SafeAreaView>
   );
