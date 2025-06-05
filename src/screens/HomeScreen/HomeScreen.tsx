@@ -1,8 +1,9 @@
+import { Info } from 'lucide-react-native';
+import { useContext } from 'react';
 import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useReminders } from '../../hooks/useReminders';
+import { AppContext } from '../../contexts/AppContext';
 import { timePipe } from '../../utils/timePipe';
-import { Info } from 'lucide-react-native';
 
 const getMedicamentSingleName = (fullName: string) => {
   const firstWord = fullName.trim().split(' ')[0];
@@ -10,46 +11,48 @@ const getMedicamentSingleName = (fullName: string) => {
 };
 
 export default function HomeScreen() {
-  const { remindersForToday } = useReminders();
+  const {
+    medicationsHook: { reminders },
+  } = useContext(AppContext);
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="white" />
       <Text style={styles.title}>MedAssist</Text>
-      {!!remindersForToday[0] && (
+      {!!reminders[0] && (
         <View style={mainReminderStyles.continaer}>
           <Text style={mainReminderStyles.label}>Próxima Dosis</Text>
           <Text style={mainReminderStyles.hour}>
             {timePipe(
-              remindersForToday[0].time.getHours(),
-              remindersForToday[0].time.getMinutes()
+              new Date(reminders[0].date).getHours(),
+              new Date(reminders[0].date).getMinutes()
             )}
           </Text>
           <Text style={mainReminderStyles.caption}>
-            {remindersForToday[0].medicationName}
+            {reminders[0].medicamentName}
           </Text>
         </View>
       )}
       <Text style={styles.subtitle}>Recordatorios</Text>
       <View style={remindersStyles.container}>
-        {remindersForToday.length >= 1 ? (
-          remindersForToday.map(reminder => (
-            <View
-              key={reminder.time.getTime()}
-              style={remindersStyles.itemContainer}
-            >
+        {reminders.length >= 1 ? (
+          reminders.map(reminder => (
+            <View key={reminder.date} style={remindersStyles.itemContainer}>
               <Text style={remindersStyles.hourLabel}>
-                {timePipe(reminder.time.getHours(), reminder.time.getMinutes())}
+                {timePipe(
+                  new Date(reminder.date).getHours(),
+                  new Date(reminder.date).getMinutes()
+                )}
               </Text>
               <Text style={remindersStyles.itemLabel}>
-                {getMedicamentSingleName(reminder.medicationName)}
+                {getMedicamentSingleName(reminder.medicamentName)}
               </Text>
               <Info color="#64748b" size={20} />
             </View>
           ))
         ) : (
           <Text style={remindersStyles.noRemindersText}>
-            No hay recordatorios todavía
+            No hay recordatorios para hoy
           </Text>
         )}
       </View>

@@ -7,8 +7,15 @@ export enum MedicationStatus {
   PENDING = 'pending',
 }
 
+export enum ScheduledMedicationStatus {
+  TAKEN = 'TAKEN', // El usuario ya tomó el medicamento
+  MISSED = 'MISSED', // Pasó el tiempo y no se tomó
+  SCHEDULED = 'SCHEDULED', // Está programado (pero no es hora aún)
+}
+
 export type MedicationBody = z.infer<typeof MedicationBodySchema>;
 export type Medication = z.infer<typeof MedicationSchema>;
+export type ScheduledMedication = z.infer<typeof ScheduledMedicationSchema>;
 
 export const MedicationBodySchema = z.object({
   medicamentName: z.string(),
@@ -37,6 +44,13 @@ export const MedicationBodyBusinessRulesSchema = MedicationBodySchema.refine(
 export const MedicationSchema = MedicationBodySchema.extend({
   id: z.string().min(1),
   administrationsDone: z.number().optional(),
-
   endDate: z.string().optional(),
+});
+
+export const ScheduledMedicationSchema = z.object({
+  id: z.string().min(1),
+  medicationId: z.string().min(1),
+  medicamentName: z.string().min(1),
+  date: z.string().datetime(),
+  status: z.nativeEnum(ScheduledMedicationStatus),
 });
