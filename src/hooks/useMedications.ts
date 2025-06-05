@@ -11,6 +11,7 @@ import {
   ScheduledMedicationSchema,
   ScheduledMedicationStatus,
 } from '../interfaces/medicament.interface';
+import { scheduleNotification } from '../../lib/notifications';
 const MEDICATIONS_KEY = '@MedAssist:Medications';
 const SCHEDULED_MEDICATIONS_KEY = '@MedAssist:ScheduledMedications';
 
@@ -52,6 +53,12 @@ export const useMedications = () => {
     return remindersForToday;
   }, [medications, scheduledMedications]);
 
+  console.log({
+    medications,
+    scheduledMedications,
+    reminders,
+  });
+
   // Carga las medicaciones.
   useEffect(() => {
     (async () => {
@@ -69,14 +76,14 @@ export const useMedications = () => {
   }, []);
 
   // Elimina los medicamentos y las medicaciones programados
-  /* useEffect(() => {
-    false // Activador
+  useEffect(() => {
+    true // Activador
       ? (async () => {
           await AsyncStorage.removeItem(MEDICATIONS_KEY);
           await AsyncStorage.removeItem(SCHEDULED_MEDICATIONS_KEY);
         })()
       : null;
-  }, []); */
+  }, []);
 
   const handleNewMedication = async (input: MedicationBody) => {
     const medication: Medication = {
@@ -96,6 +103,19 @@ export const useMedications = () => {
         ...generateScheduledMedications(medication),
       ];
       setScheduledMedications(_scheduledMedications);
+
+      // Programar las notificaciones.
+      await Promise.all(
+        _scheduledMedications.map(({ date, medicamentName }) => {
+          scheduleNotification({
+            date,
+            title: `Hora de tomar ${medicamentName}`,
+            body: `Es hora de tomar tu medicamento ${medicamentName}`,
+          });
+        })
+      );
+
+      // Almacena las medicaciones programadas.
       await AsyncStorage.setItem(
         SCHEDULED_MEDICATIONS_KEY,
         JSON.stringify(_scheduledMedications)
@@ -104,14 +124,6 @@ export const useMedications = () => {
       console.log('🚀 ~ handleNewMedicament ~ error:', error);
     }
   };
-
-  console.log('🚀 ~ useMedications ~ medications:', medications);
-
-  console.log(
-    '🚀 ~ useMedications ~ scheduledMedications:',
-    scheduledMedications
-  );
-  console.log('🚀 ~ useMedications ~ reminders:', reminders);
 
   return { medications, scheduledMedications, reminders, handleNewMedication };
 };
@@ -148,7 +160,6 @@ const generateScheduledMedications = (
           customTime.minutes
         )
       );
-    } else {
       remainingDoses--;
     }
   });
@@ -160,9 +171,6 @@ const generateScheduledMedications = (
   while (remainingDoses > 0) {
     customTimes.forEach(customTime => {
       dateCounter++;
-      if (remainingDoses < 0) {
-        return;
-      }
       scheduledDates.push(
         new Date(
           today.getFullYear(),
@@ -181,12 +189,10 @@ const generateScheduledMedications = (
       id: uuid.v4(),
       medicationId,
       medicamentName,
-      date: date.toString(),
+      date: date.toISOString(),
       status: ScheduledMedicationStatus.SCHEDULED,
     })
   );
-
-  // Programa las medicaciones
 
   return _scheduledMedications;
 };

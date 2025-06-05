@@ -29,14 +29,14 @@ import { timePipe } from '../utils/timePipe';
 
 const useMedicamentModal = (onClose: () => void) => {
   const { medicationsHook } = useContext(AppContext);
-  const { control, handleSubmit, getValues, watch, reset } =
-    useForm<MedicationBody>({
-      resolver: zodResolver(MedicationBodyBusinessRulesSchema),
-      defaultValues: {
-        customTimes: [],
-        status: MedicationStatus.ACTIVE,
-      },
-    });
+  const { control, handleSubmit, watch, reset } = useForm<MedicationBody>({
+    resolver: zodResolver(MedicationBodyBusinessRulesSchema),
+    defaultValues: {
+      doseNumberPerDay: '' as any,
+      customTimes: [],
+      status: MedicationStatus.ACTIVE,
+    },
+  });
 
   const customTimes = useFieldArray({ control, name: 'customTimes' });
   const [isCustomTimesExceeded, setIsCustomTimesExceeded] = useState(false);
@@ -52,17 +52,17 @@ const useMedicamentModal = (onClose: () => void) => {
   useEffect(() => {
     if (
       !isCustomTimesExceeded &&
-      customTimes.fields.length >= getValues('doseNumberPerDay')
+      customTimes.fields.length >= numberOfDosesPerDay
     ) {
       setIsCustomTimesExceeded(true);
     } else if (
       isCustomTimesExceeded &&
-      customTimes.fields.length < getValues('doseNumberPerDay')
+      customTimes.fields.length < numberOfDosesPerDay
     ) {
       setIsCustomTimesExceeded(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customTimes.fields.length]);
+  }, [customTimes.fields.length, numberOfDosesPerDay]);
 
   // ** This function is called when the user confirms a custom time
   const handleCustomTimeConfirmation = (date: Date) => {
@@ -180,7 +180,9 @@ const CreateMedicamentModal: React.FC<CreateMedicamentModalProps> = ({
             <TextInput
               style={styles.input}
               value={value?.toString()}
-              onChangeText={text => onChange(Number(text))}
+              onChangeText={text =>
+                onChange(isNaN(Number(text)) ? '' : Number(text))
+              }
               keyboardType="numeric"
             />
           )}
