@@ -91,7 +91,10 @@ export const useMedications = () => {
       await AsyncStorage.setItem(MEDICATIONS_KEY, JSON.stringify(_medicatons));
 
       // Genera las medicaciones programadas.
-      const _scheduledMedications = generateScheduledMedications(medication);
+      const _scheduledMedications = [
+        ...scheduledMedications,
+        ...generateScheduledMedications(medication),
+      ];
       setScheduledMedications(_scheduledMedications);
       await AsyncStorage.setItem(
         SCHEDULED_MEDICATIONS_KEY,
@@ -183,6 +186,8 @@ const generateScheduledMedications = (
     })
   );
 
+  // Programa las medicaciones
+
   return _scheduledMedications;
 };
 
@@ -213,6 +218,10 @@ const getScheduledMedicationsFromStorage = async (): Promise<
       ? JSON.parse(storedScheduledMedications)
       : [];
 
+    console.log(
+      '🚀 ~ storedScheduledMedicationsParsed:',
+      storedScheduledMedicationsParsed
+    );
     const { data } = z
       .array(ScheduledMedicationSchema)
       .safeParse(storedScheduledMedicationsParsed);
